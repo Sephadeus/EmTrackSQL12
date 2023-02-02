@@ -18,7 +18,7 @@ const db = mysql.createConnection(
 
   const menuOptions = [ 
     'View All Departments',
-    'View All Jobs',
+    'View All Roles',
     'View All Employees',
     'Add Department',
     'Add Role',
@@ -27,8 +27,13 @@ const db = mysql.createConnection(
     'Delete Department',
     'Delete Role',
     'Terminate Employee',
-    'Exit Menu'
+    'Exit Menu',
   ];
+
+  const init = () => {
+    console.clear();
+    mainMenu();
+  }
 
 
   const mainMenu = () => {
@@ -39,7 +44,7 @@ const db = mysql.createConnection(
       choices: menuOptions
     })
     .then(answers => {
-      processAnswer(answers.option)
+      processAnswer(answers.menu)
     })
   }
 
@@ -84,5 +89,39 @@ const db = mysql.createConnection(
     }
 
     
-mainMenu();
+const viewDepartments = () => {
+  db.query('SELECT * FROM department', function(err, result) {
+    if(!result){
+      console.log("No Departments In Database");
+    } else {
+    console.table(result); 
+    mainMenu();
+  }
+})
+}
+
+const viewRoles = () => {
+  db.query('SELECT * FROM role', function(err, result) {
+    if(!result){
+      console.log("No Roles In Database");
+    } else {
+    console.table(result); 
+    mainMenu();
+  }
+})
+}
+
+const viewEmployees = () => {
+  db.query('SELECT * FROM employees', function(err, result) {
+    if(!result){
+      console.log("No Employees In Database");
+    } else {
+    console.table(result); 
+    mainMenu();
+  }
+})
+}
+
+init();
   
+
