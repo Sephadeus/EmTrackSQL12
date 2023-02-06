@@ -171,7 +171,7 @@ function addRole() {
           type: "list",
           message: "Please enter the department ID of the role to be added.",
           choices: results.map((result) => {
-            return { name: result.name, value: result.id };
+            return { name: result.department_name, value: result.id };
           }),
         },
       ])
@@ -185,7 +185,9 @@ function addRole() {
               addRole();
             } else {
               console.log(`${answer.title} added to roles!`);
+              mainMenu();
             }
+
           }
         );
       });
@@ -193,6 +195,7 @@ function addRole() {
 }
 
 function addEmployee() {
+  
   db.query("SELECT * FROM role;", function (err, results) {
     inquirer
       .prompt([
