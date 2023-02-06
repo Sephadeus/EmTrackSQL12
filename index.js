@@ -90,7 +90,7 @@ const processAnswer = (choice) => {
 };
 
 function viewDepartments() {
-  db.query("SELECT * FROM department;", function (err, result) {
+  db.query("SELECT department_name FROM department", function (err, result) {
     if (err) throw err;
     console.table(result);
     mainMenu();
@@ -98,7 +98,8 @@ function viewDepartments() {
 }
 
 function viewRoles() {
-  db.query("SELECT * FROM role;", function (err, result) {
+  db.query(
+    "SELECT role.title AS 'Title', role.salary AS 'Salary', department.department_name AS 'Department' FROM role LEFT JOIN department ON role.department_id = department.id", function (err, result) {
     if (err) throw err;
     console.table(result);
     mainMenu();
@@ -250,23 +251,46 @@ function deleteDepartment() {
       type: "list",
       message: "Select a department to remove.",
       choices: results.map((result) => {
-        return {name: result.department_name, value: result.id}
+        return {name: result.department_name, value: result.department_name}
       })
     })
     .then((answer) => {
-      db.query("DELETE from department WHERE id = ?", 
+      db.query("DELETE from department WHERE department_name = ?", 
       [answer.deptName], 
       function(err, results) {
         if (err) {
           console.log(err)
         } else {
-          console.log(results)
           console.log(`${answer.deptName} removed.`);
           mainMenu();
         }
       })
     })
   })
+};
+
+function deleteEmployee() {
+  db.query("SELECT * FROM employees", function(err, results) {
+  inquirer
+  .prompt({
+    name: "delEmp",
+    type: "list",
+    message: "Who would you like to fire?",
+    choices: results.map((result) => { 
+    return {name: result.first_name + " " + result.last_name, value: [result.id, result.first_name + " " + result.last_name]}
+  })
+  })
+  .then((answer) => {
+    db.query("DELETE FROM employees WHERE id = ?", [answer.delEmp[0]], function(err, results){
+      if (err){
+        console.log(err)
+      } else {
+        console.log(`${answer.delEmp[1]}, you're fired.`);
+        mainMenu();
+      }
+    })
+})
+})
 }
 
 init();
