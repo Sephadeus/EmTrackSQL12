@@ -17,6 +17,7 @@ CREATE TABLE role(
     department_id INT NOT NULL,
     FOREIGN KEY (department_id)
     REFERENCES department(id)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS employees;
@@ -28,5 +29,8 @@ CREATE TABLE employees(
     manager_id INT,
     FOREIGN KEY (role_id)
     REFERENCES role(id)
-    ON DELETE CASCADE
+    ON DELETE CASCADE, 
+    FOREIGN KEY (manager_id)
+    REFERENCES employees(id)
+    ON DELETE SET NULL
 );

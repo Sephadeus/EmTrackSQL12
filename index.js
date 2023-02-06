@@ -141,7 +141,7 @@ function addDepartment() {
         [answer.department],
         function (err, result) {
           if (err) {
-            console.log("Entry must be a valid input.");
+            console.log(err);
             addDepartment();
           } else {
             console.log(`${answer.department} added!`);
@@ -181,7 +181,7 @@ function addRole() {
           [answer.title, answer.salary, answer.dept],
           function (err, result) {
             if (err) {
-              console.log("Entry must be a valid input.");
+              console.log(err);
               addRole();
             } else {
               console.log(`${answer.title} added to roles!`);
@@ -214,7 +214,7 @@ function addEmployee() {
           type: "list",
           message: "Please enter the role ID of the employee to be added.",
           choices: results.map((result) => {
-            return { id: result.id, name: result.title, value: result.id };
+            return { name: result.title, value: result.id };
           }),
         },
         {
@@ -225,11 +225,11 @@ function addEmployee() {
       ])
       .then((answer) => {
         db.query(
-          "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);",
+          "INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);",
           [answer.first, answer.last, answer.role, answer.manager],
           function (err, results) {
             if (err) {
-              console.log("Entry must be a valid input.");
+              console.log(err);
               addEmployee();
             } else {
               console.log(
@@ -241,6 +241,32 @@ function addEmployee() {
         );
       });
   });
+}
+
+function deleteDepartment() {
+  db.query("SELECT * FROM department", function(err, results) {
+    inquirer.prompt({
+      name: "deptName",
+      type: "list",
+      message: "Select a department to remove.",
+      choices: results.map((result) => {
+        return {name: result.department_name, value: result.id}
+      })
+    })
+    .then((answer) => {
+      db.query("DELETE from department WHERE id = ?", 
+      [answer.deptName], 
+      function(err, results) {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log(results)
+          console.log(`${answer.deptName} removed.`);
+          mainMenu();
+        }
+      })
+    })
+  })
 }
 
 init();
