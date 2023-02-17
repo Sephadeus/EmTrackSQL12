@@ -692,6 +692,7 @@ function updateEmployee() {
                 }})
       }});
   }});
+})
 }
 
 function deleteDepartment() {
