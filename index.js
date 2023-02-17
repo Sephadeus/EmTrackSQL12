@@ -502,6 +502,7 @@ function updateEmployee() {
                     };
                   }),
                 })
+              })
                 .then((answer) => {
                   db.query(
                     `UPDATE employees
@@ -520,7 +521,6 @@ function updateEmployee() {
                     }
                   );
                 });
-            });
             break;
 
           case "Change Manager":
@@ -621,10 +621,8 @@ function updateEmployee() {
                               );
                             });
                       }
-                    });
-                }
-              }
-            );
+                    })
+        }});  
             break;
 
           case "Last":
@@ -652,7 +650,7 @@ function updateEmployee() {
                       mainMenu();
                     }
                   }
-                );
+                )
               });
             break;
 
@@ -668,7 +666,7 @@ function updateEmployee() {
                   name: "newLast",
                   type: "input",
                   message: "Please input the new last name",
-                },
+                }
               ])
               .then((answer) => {
                 db.query(
@@ -687,14 +685,13 @@ function updateEmployee() {
                       mainMenu();
                     }
                   }
-                );
+                )
               });
             break;
 
           case "Cancel Update":
             mainMenu();
             break;
-
         }
       });
   });
