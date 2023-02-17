@@ -101,26 +101,10 @@ const processAnswer = (choice) => {
   }
 };
 
-function viewDepartments() {
-  db.query(
-    `SELECT department.id AS 'ID', 
-    department.department_name AS 'Department' FROM department`,
-    function (err, result) {
-      if (err) throw err;
-      console.table(result);
-      mainMenu();
-    }
-  );
-}
-
 // function viewDepartments() {
 //   db.query(
-//     `SELECT department.id AS 'ID', department_name AS 'Department',
-//             COUNT(employees.id)
-//             WHERE employees.role_id = role.department_id
-//             AND role.department_id = department.id) AS 'Total Employees'
-//             FROM ((department JOIN role ON department.id  = role.department_id)
-//             JOIN employees ON role.id  = employees.role_id;`,
+//     `SELECT department.id AS 'ID', 
+//     department.department_name AS 'Department' FROM department`,
 //     function (err, result) {
 //       if (err) throw err;
 //       console.table(result);
@@ -128,6 +112,23 @@ function viewDepartments() {
 //     }
 //   );
 // }
+
+function viewDepartments() {
+  db.query(
+    `SELECT department.id AS 'ID', 
+            department.department_name AS 'Department',
+            (COUNT(employees.id)
+            WHERE employees.role_id = role.id
+            AND role.department_id = department.id) AS 'Total Employees'
+            FROM ((department JOIN role ON department.id  = role.department_id)
+            JOIN employees ON role.id = employees.role_id;`,
+    function (err, result) {
+      if (err) throw err;
+      console.table(result);
+      mainMenu();
+    }
+  );
+}
 
 function viewEmployeesByRole() {
   db.query("SELECT * FROM role", function (err, results) {
