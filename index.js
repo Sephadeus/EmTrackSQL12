@@ -619,13 +619,10 @@ function updateEmployee() {
                                   }
                                 }
                               );
-                            });
-                      }
-                    })
-        }});  
-            break;
+                            });            
+                            break;
 
-          case "Last":
+                        case "Last":
             inquirer
               .prompt([
                 {
@@ -692,9 +689,9 @@ function updateEmployee() {
           case "Cancel Update":
             mainMenu();
             break;
-        }
-      });
-  });
+                }})
+      }});
+  }});
 }
 
 function deleteDepartment() {
