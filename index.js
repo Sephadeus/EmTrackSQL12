@@ -17,8 +17,10 @@ const db = mysql.createConnection(
 
 const menuOptions = [
   "View All Departments",
+  "Department Population",
   "Add Department",
   "Update Department",
+  // "View Department Budget",
   "Delete Department",
   "View All Roles",
   "Add Role",
@@ -56,6 +58,9 @@ const processAnswer = (choice) => {
     case "View All Departments":
       viewDepartments();
       break;
+    case "Department Population":
+      departmentPopulation();
+      break;
     case "View All Roles":
       viewRoles();
       break;
@@ -64,6 +69,9 @@ const processAnswer = (choice) => {
       break;
     case "View Employees By Role":
       viewEmployeesByRole();
+      break;
+    case "View Department Budget":
+      sumSalaries();
       break;
     case "Add Department":
       addDepartment();
@@ -101,27 +109,10 @@ const processAnswer = (choice) => {
   }
 };
 
-// function viewDepartments() {
-//   db.query(
-//     `SELECT department.id AS 'ID', 
-//     department.department_name AS 'Department' FROM department`,
-//     function (err, result) {
-//       if (err) throw err;
-//       console.table(result);
-//       mainMenu();
-//     }
-//   );
-// }
-
 function viewDepartments() {
   db.query(
-    `SELECT department.id AS 'ID', 
-            department.department_name AS 'Department',
-            (COUNT(employees.id)
-            WHERE employees.role_id = role.id
-            AND role.department_id = department.id) AS 'Total Employees'
-            FROM ((department JOIN role ON department.id  = role.department_id)
-            JOIN employees ON role.id = employees.role_id;`,
+    `SELECT id AS 'ID', 
+    department_name AS 'Department' FROM department`,
     function (err, result) {
       if (err) throw err;
       console.table(result);
@@ -129,6 +120,141 @@ function viewDepartments() {
     }
   );
 }
+
+function departmentPopulation() {
+  db.query(`SELECT * FROM department`, function (err, results) {
+    if (err) {
+      console.log(err);
+    } else {
+      inquirer
+        .prompt({
+          name: "dept",
+          type: "list",
+          message:
+            "Which department would you like to check the number of employees in?",
+          choices: results.map((result) => {
+            return {
+              name: result.department_name,
+              value: [result.id, result.department_name],
+            };
+          }),
+        })
+        .then((answer) => {
+          let deptAnswer = [answer.dept[0], answer.dept[1]];
+
+          let deptRoles = [];
+
+          db.query(
+            `SELECT * FROM role WHERE department_id = ?;`,
+            deptAnswer[0],
+            function (err, results) {
+              if (err) {
+                console.log(err);
+              } else {
+                results.map((result) => {
+                  deptRoles.push(result.id);
+                });
+                // console.log(deptRoles)
+                return deptRoles;
+              }
+            }
+          );
+          // console.log(deptRoles.length)
+          var count = 0;
+          db.query(`SELECT * FROM employees`, function (err, results) {
+            if (err) {
+              console.log(err);
+            } else {
+              results.forEach((result) => {
+                // console.log(result);
+                for (let i = 0; i < deptRoles.length; i++) {
+                  if (deptRoles[i] !== result.role_id) {
+                    // console.log(count)
+                  } else {
+                    count++;
+                    // console.log(count);
+                  }
+                }
+              });
+              if (count == 0) {
+                console.log(
+                  `There are no employees in the ${deptAnswer[1]} department.`
+                );
+                mainMenu();
+              } else if (count == 1) {
+                console.log(
+                  `There is ${count} employee in the ${deptAnswer[1]} department.`
+                );
+                mainMenu();
+              } else {
+                console.log(
+                  `There are ${count} employees in the ${deptAnswer[1]} department.`
+                );
+                mainMenu();
+              }
+            }
+          });
+        });
+    }
+  });
+}
+
+// db.query(
+//   `COUNT(employees) WHERE role.department_id = 1
+//   FROM role
+//   INNER JOIN employees
+//   ON role.id = employees.role_id`,
+//   function (err, result) {
+//     if (err) throw err;
+//     console.table(result);
+//     mainMenu();
+//   }
+// );
+
+// function sumSalaries() {
+//   const departments = [
+//     {
+//       name: "Cancel",
+//       value: ["Cancel", "Cancel"],
+//     },
+//   ];
+
+//   db.query(`SELECT * FROM department`, function (err, results) {
+//     results.map((result) => {
+//       departments.push({
+//         name: result.department_name,
+//         value: [result.id, result.department_name],
+//       });
+//     });
+
+//     inquirer
+//       .prompt({
+//         name: "deptChoice",
+//         type: "list",
+//         message: "Which department would you like to view the budget for?",
+//         choices: departments,
+//       })
+//       .then((answer) => {
+//         if (answer.deptChoice[0] == "Cancel") {
+//           mainMenu();
+//         } else {
+//           db.query(
+//             `SUM(salary) WHERE department_id = ? FROM role;`,
+//             answer.deptChoice[0],
+//             function (err, result) {
+//               if (err) {
+//                 console.log(err);
+//                 sumSalaries();
+//               } else {
+//                 console.table(result);
+//                 mainMenu();
+//               }
+//             }
+//           );
+//         }
+//       });
+//   });
+// }
 
 function viewEmployeesByRole() {
   db.query("SELECT * FROM role", function (err, results) {
@@ -185,7 +311,8 @@ function viewEmployees() {
   department_name,
   manager_id 
   FROM ((department JOIN role ON department.id = role.department_id) 
-  JOIN employees ON role.id = employees.role_id);`,
+  JOIN employees ON role.id = employees.role_id)
+  ORDER BY department_name ASC;`,
 
     function (err, result) {
       if (err) throw err;
@@ -491,37 +618,33 @@ function updateEmployee() {
         switch (answer.updateWhat) {
           case "Role":
             db.query("SELECT * FROM role", function (err, results) {
-              inquirer
-                .prompt({
-                  name: "role",
-                  type: "list",
-                  message: "Which role are you assigning this employee?",
-                  choices: results.map((result) => {
-                    return {
-                      name: result.title,
-                      value: [result.id, result.title],
-                    };
-                  }),
-                })
-              })
-                .then((answer) => {
-                  db.query(
-                    `UPDATE employees
+              inquirer.prompt({
+                name: "role",
+                type: "list",
+                message: "Which role are you assigning this employee?",
+                choices: results.map((result) => {
+                  return {
+                    name: result.title,
+                    value: [result.id, result.title],
+                  };
+                }),
+              });
+            }).then((answer) => {
+              db.query(
+                `UPDATE employees
                 SET role_id=?
                 WHERE id=?`,
-                    [answer.role[0], employeeProfile[0]],
-                    function (err, results) {
-                      if (err) {
-                        console.log(err);
-                      } else {
-                        console.log(
-                          `Employee role updated to ${answer.role[1]}.`
-                        );
-                        mainMenu();
-                      }
-                    }
-                  );
-                });
+                [answer.role[0], employeeProfile[0]],
+                function (err, results) {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    console.log(`Employee role updated to ${answer.role[1]}.`);
+                    mainMenu();
+                  }
+                }
+              );
+            });
             break;
 
           case "Change Manager":
@@ -547,7 +670,9 @@ function updateEmployee() {
                         console.log(err);
                         updateEmployee();
                       } else {
-                        console.log(`${employeeProfile[1]} assigned managerial status!`);
+                        console.log(
+                          `${employeeProfile[1]} assigned managerial status!`
+                        );
                         mainMenu();
                       }
                     }
@@ -620,80 +745,88 @@ function updateEmployee() {
                                   }
                                 }
                               );
-                            });            
-                            break;
+                            });
+                          break;
 
                         case "Last":
-            inquirer
-              .prompt([
-                {
-                  name: "newName",
-                  type: "input",
-                  message: "Please input the new last name",
-                },
-              ])
-              .then((answer) => {
-                db.query(
-                  `UPDATE employees 
+                          inquirer
+                            .prompt([
+                              {
+                                name: "newName",
+                                type: "input",
+                                message: "Please input the new last name",
+                              },
+                            ])
+                            .then((answer) => {
+                              db.query(
+                                `UPDATE employees 
                               SET last_name=?
                               WHERE id=?`,
-                  [answer.newName, employeeProfile[0]],
-                  function (err, results) {
-                    if (err) {
-                      console.log(err);
-                    } else {
-                      console.log(
-                        `Employee last name changed to ${answer.newName}!`
-                      );
-                      mainMenu();
-                    }
-                  }
-                )
-              });
-            break;
+                                [answer.newName, employeeProfile[0]],
+                                function (err, results) {
+                                  if (err) {
+                                    console.log(err);
+                                  } else {
+                                    console.log(
+                                      `Employee last name changed to ${answer.newName}!`
+                                    );
+                                    mainMenu();
+                                  }
+                                }
+                              );
+                            });
+                          break;
 
-          case "Both":
-            inquirer
-              .prompt([
-                {
-                  name: "newFirst",
-                  type: "input",
-                  message: "Please input the new first name",
-                },
-                {
-                  name: "newLast",
-                  type: "input",
-                  message: "Please input the new last name",
-                }
-              ])
-              .then((answer) => {
-                db.query(
-                  `UPDATE employees 
+                        case "Both":
+                          inquirer
+                            .prompt([
+                              {
+                                name: "newFirst",
+                                type: "input",
+                                message: "Please input the new first name",
+                              },
+                              {
+                                name: "newLast",
+                                type: "input",
+                                message: "Please input the new last name",
+                              },
+                            ])
+                            .then((answer) => {
+                              db.query(
+                                `UPDATE employees 
                                 SET first_name=?,
                                 last_name=?
                                 WHERE id=?`,
-                  [answer.newFirst, answer.newLast, employeeProfile[0]],
-                  function (err, results) {
-                    if (err) {
-                      console.log(err);
-                    } else {
-                      console.log(
-                        `Employee name changed to ${answer.newFirst} ${answer.newLast}!`
-                      );
-                      mainMenu();
-                    }
-                  }
-                )
-              });
-            break;
+                                [
+                                  answer.newFirst,
+                                  answer.newLast,
+                                  employeeProfile[0],
+                                ],
+                                function (err, results) {
+                                  if (err) {
+                                    console.log(err);
+                                  } else {
+                                    console.log(
+                                      `Employee name changed to ${answer.newFirst} ${answer.newLast}!`
+                                    );
+                                    mainMenu();
+                                  }
+                                }
+                              );
+                            });
+                          break;
 
-          case "Cancel Update":
-            mainMenu();
-            break;
-                }})
-      }});
-  }});
-})
+                        case "Cancel Update":
+                          mainMenu();
+                          break;
+                      }
+                    });
+                }
+              }
+            );
+        }
+      });
+  });
 }
 
 function deleteDepartment() {
@@ -790,4 +923,3 @@ function deleteEmployee() {
 }
 
 init();
-
