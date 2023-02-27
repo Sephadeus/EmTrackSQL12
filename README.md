@@ -6,7 +6,7 @@ This project is a command line content management system. The purpose of this pr
 This application uses Node.js for running the application, MySQL2 for the connection to the database, and the console.table NPM package for viewing tables.
 
 ## Visuals
-Check out the screenshot here --> ![2023-01-24 18 33 19 sephadeus-note-taker herokuapp com 6976eab6d403](https://user-images.githubusercontent.com/90430093/214444521-b9d3e558-7cb7-46e5-937d-2fd6c9d34ae7.jpg)
+Check out the screenshot here --> 
 
 
 ## Installation
