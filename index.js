@@ -161,6 +161,7 @@ function departmentPopulation() {
           );
           // console.log(deptRoles.length)
           var count = 0;
+          var employeeList =[];
           db.query(`SELECT * FROM employees`, function (err, results) {
             if (err) {
               console.log(err);
@@ -170,8 +171,11 @@ function departmentPopulation() {
                 for (let i = 0; i < deptRoles.length; i++) {
                   if (deptRoles[i] !== result.role_id) {
                     // console.log(count)
+                    return;
                   } else {
+                    employeeList.push(result.first_name + " " + result.last_name)
                     count++;
+
                     // console.log(count);
                   }
                 }
@@ -183,12 +187,12 @@ function departmentPopulation() {
                 mainMenu();
               } else if (count == 1) {
                 console.log(
-                  `There is ${count} employee in the ${deptAnswer[1]} department.`
+                  `There is ${count} employee in the ${deptAnswer[1]} department, ${employeeList}`
                 );
                 mainMenu();
               } else {
                 console.log(
-                  `There are ${count} employees in the ${deptAnswer[1]} department.`
+                  `There are ${count} employees in the ${deptAnswer[1]} department, ${employeeList}`
                 );
                 mainMenu();
               }
@@ -628,8 +632,8 @@ function updateEmployee() {
                     value: [result.id, result.title],
                   };
                 }),
-              });
-            }).then((answer) => {
+              })
+            .then((answer) => {
               db.query(
                 `UPDATE employees
                 SET role_id=?
@@ -643,8 +647,9 @@ function updateEmployee() {
                     mainMenu();
                   }
                 }
-              );
-            });
+              )
+            })
+          });
             break;
 
           case "Change Manager":

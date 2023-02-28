@@ -1,12 +1,12 @@
 # SQL Content Management System
 
 ## Description
-This project is a command line content management system. The purpose of this project was to utilize the database construction power of MySQL2 and the interactivity of JavaScript to create and manage a database of employees, departments, and roles.
+This project is a command line content management system. The purpose of this project was to utilize the database construction power of MySQL2 and the interactivity of JavaScript to create and manage a database of employees, departments, and roles. 
 
-This application uses Node.js for running the application, MySQL2 for the connection to the database, and the console.table NPM package for viewing tables.
+This application uses Node.js for running the application, the Inquirer v8.2.4 NPM package for prompts, MySQL2 NPM package for the connection to the database, and the console.table NPM package for viewing tables.
 
 ## Visuals
-Check out the screenshot here --> ![2023-01-24 18 33 19 sephadeus-note-taker herokuapp com 6976eab6d403](https://user-images.githubusercontent.com/90430093/214444521-b9d3e558-7cb7-46e5-937d-2fd6c9d34ae7.jpg)
+Click this link to view a demonstration video: https://watch.screencastify.com/v/rBoDoi5W6Jga0ENRt8zy
 
 
 ## Installation
@@ -16,9 +16,11 @@ Clone the repository listed in the Usage section of the README.
 
 1. Clone the repository here --> https://github.com/Sephadeus/EmTrackSQL12
 2. Open the ternminal and navigate to the project folder 
-3. Open mysql with the "mysql -u root -p" command and enter your mysql password.
-4. Run the command "source db/schema.sql" then "source db/seeds.sql", then "exit".
-5. Make sure you are still in the correct project directory and run "npm run start" to begin. You should be greeted with a message and a menu of options.
+3. Open mysql with the ```mysql -u root -p``` command and enter your mysql password.
+4. Run the command ```source db/schema.sql``` then ```source db/seeds.sql```, then ```exit```.
+5. Make sure you are still in the correct project directory and run ```npm run start``` to begin. You should be greeted with a message and a menu of options.
+
+
 
 
 ## Support
